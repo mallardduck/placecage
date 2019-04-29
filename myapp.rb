@@ -2,7 +2,6 @@ set :public_folder, File.dirname(__FILE__) + '/public'
 set :generated_images_folder, File.dirname(__FILE__) + '/images/generated'
 set :images_folder, File.dirname(__FILE__) + '/images/source'
 set :static_cache_control, [:public, :max_age => 300]
-gabba = nil
 domain = nil
 
 before do
@@ -11,18 +10,6 @@ before do
   else
     domain = request.host.split('.').reverse[1]
   end
-
-  #set gabba
-  ga_index = 1
-  case domain
-  when 'fillmurray'
-    ga_index = 1
-  when 'placecage'
-    ga_index = 2
-  when 'stevensegallery'
-    ga_index = 3
-  end
-  gabba = Gabba::Gabba.new("UA-37788508-#{ga_index}", "auto")
 
   pass if request.path. == '/'
   cache_control :public, :max_age => 31536000
@@ -36,32 +23,24 @@ end
 get '/:width/:height', '/:width/:height/' do
   width = params[:width].to_i
   height = params[:height].to_i
-  gabba.identify_user(cookies[:__utma], cookies[:__utmz])
-  gabba.page_view("Show", "#{width}/#{height}")
   return_image(domain,width,height)
 end
 
 get '/c/:width/:height', '/c/:width/:height/' do
   width = params[:width].to_i
   height = params[:height].to_i
-  gabba.identify_user(cookies[:__utma], cookies[:__utmz])
-  gabba.page_view("ShowCrazy", "c/#{width}/#{height}")
   return_image(domain,width,height,:crazy)
 end
 
 get '/g/:width/:height', '/g/:width/:height/' do
   width = params[:width].to_i
   height = params[:height].to_i
-  gabba.identify_user(cookies[:__utma], cookies[:__utmz])
-  gabba.page_view("ShowGray", "g/#{width}/#{height}")
   return_image(domain,width,height,:grayscale)
 end
 
 get '/gif/:width/:height', '/gif/:width/:height/' do
   width = params[:width].to_i
   height = params[:height].to_i
-  gabba.identify_user(cookies[:__utma], cookies[:__utmz])
-  gabba.page_view("ShowGif", "gif/#{width}/#{height}")
   return_gif(domain,width,height)
 end
 
